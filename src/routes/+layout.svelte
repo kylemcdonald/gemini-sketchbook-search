@@ -19,7 +19,7 @@
 {#if !isSplashPage}
   <div class="container">
     <div class="header">
-      <a href="/" class="home-link">Sketchbook Search</a>
+      <a href="/" class="home-link"><b>Sketchbook Search</b> Powered by Gemini</a>
       <div class="nav-buttons">
         <button 
           class:active={currentView === 'search'} 

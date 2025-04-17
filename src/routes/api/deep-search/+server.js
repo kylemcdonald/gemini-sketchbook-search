@@ -10,16 +10,24 @@ export async function POST({ request }) {
     // Return specific pages as mock results
     const results = [
       {
+        filename: "18/116.json",
+        explanation: "Intimate portrait of a woman sleeping"
+      },
+      {
         filename: "18/118.json",
         explanation: "Intimate portrait of a woman sleeping"
+      },
+      {
+        filename: "8/31.json",
+        explanation: "Three portraits of a sleeping person"
       },
       {
         filename: "6/119.json",
         explanation: "Two portraits of someone sleeping"
       },
       {
-        filename: "4/153.json",
-        explanation: "Careful portrait of a young woman"
+        filename: "4/152.json",
+        explanation: "Side portrait of a young woman"
       }
     ];
     
