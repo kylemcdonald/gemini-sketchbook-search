@@ -1,0 +1,19 @@
+/* If this file doesn't exist, create it in the src directory */
+:root {
+  /* Font stack moved to layout.svelte */
+}
+
+/* Base font stack */
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji" !important;
+}
+
+body {
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  font-family: inherit;
+} 
