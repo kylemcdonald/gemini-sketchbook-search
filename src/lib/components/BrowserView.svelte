@@ -12,6 +12,8 @@
   let currentSketchbook = null;
   let currentPageIndex = 0;
   let metadata = [];
+  let isEditing = false;
+  let editedTranscript = '';
 
   // Helper function to extract page number from filename
   function getPageNum(filename) {
@@ -161,6 +163,8 @@
   }
 
   function handleKeydown(event) {
+    if (isEditing) return;
+    
     if (event.key === 'ArrowRight') {
       nextPage();
     } else if (event.key === 'ArrowLeft') {
@@ -173,6 +177,47 @@
     const imagePath = currentSketchbook.files[currentPageIndex];
     const metadataKey = imagePath.replace('/images/', '').replace('.jpg', '.json');
     return metadata.find(item => item.filename === metadataKey);
+  }
+
+  async function handleEdit() {
+    const currentMetadata = getCurrentPageMetadata();
+    if (currentMetadata) {
+      isEditing = true;
+      editedTranscript = currentMetadata.transcript;
+    }
+  }
+
+  async function handleSave() {
+    const currentMetadata = getCurrentPageMetadata();
+    if (currentMetadata) {
+      try {
+        const response = await fetch('/api/update-metadata', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            filename: currentMetadata.filename,
+            transcript: editedTranscript
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save metadata');
+        }
+
+        // Update local metadata
+        const updatedMetadata = await response.json();
+        const index = metadata.findIndex(item => item.filename === currentMetadata.filename);
+        if (index !== -1) {
+          metadata[index] = updatedMetadata;
+        }
+
+        isEditing = false;
+      } catch (error) {
+        console.error('Error saving metadata:', error);
+      }
+    }
   }
 
   function handlePageSelect(file) {
@@ -281,7 +326,25 @@
             {/each}
           </div>
         {/if}
-        <p>{getCurrentPageMetadata().transcript}</p>
+        <div class="transcript-container">
+          <div class="transcript-header">
+            <h3>Transcription</h3>
+            <button 
+              class="edit-button" 
+              on:click={isEditing ? handleSave : handleEdit}
+            >
+              {isEditing ? 'Save' : 'Edit'}
+            </button>
+          </div>
+          {#if isEditing}
+            <textarea 
+              bind:value={editedTranscript}
+              class="transcript-edit"
+            ></textarea>
+          {:else}
+            <p>{getCurrentPageMetadata().transcript}</p>
+          {/if}
+        </div>
 
         {#if getCurrentPageMetadata()}
           <div class="similar-pages-container">
@@ -467,6 +530,48 @@
     height: calc(100% - 2rem);
     box-sizing: border-box;
     overscroll-behavior: contain;
+  }
+
+  .transcript-container {
+    margin-bottom: 1rem;
+  }
+
+  .transcript-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .transcript-header h3 {
+    margin: 0;
+  }
+
+  .edit-button {
+    padding: 0.25rem 0.5rem;
+    background: #666;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .edit-button:hover {
+    background: #555;
+  }
+
+  .transcript-edit {
+    width: 100%;
+    min-height: 200px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.5;
+    resize: vertical;
   }
 
   .text-container h3 {
